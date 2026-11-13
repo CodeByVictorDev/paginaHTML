@@ -1,0 +1,199 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Iniciar sesión - Mesa de Incidencias</title>
+<style>
+  :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}
+  img{max-width:100%}
+  [hidden]:not([hidden=until-found i]){display:none!important}
+
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #fafbfc;
+    --border: #e3e6ec;
+    --border-strong: #cfd4dd;
+    --fg: #1a1f2b;
+    --fg-muted: #5b6473;
+    --fg-dim: #8a93a3;
+    --accent: #3b5a7a;
+    --accent-ink: #ffffff;
+    --accent-soft: #e8eef5;
+    --grid: rgba(59, 90, 122, 0.06);
+
+    --sev-crit-bar: #c0392b;
+
+    --f-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --f-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --f-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1319;
+      --surface: #171c25;
+      --surface-2: #1c222d;
+      --border: #262d3a;
+      --border-strong: #343c4c;
+      --fg: #e8ebf1;
+      --fg-muted: #a0a9b8;
+      --fg-dim: #6e7788;
+      --accent: #7aa3cc;
+      --accent-ink: #0f1319;
+      --accent-soft: #1f2a37;
+      --grid: rgba(122, 163, 204, 0.08);
+      --sev-crit-bar: #e85d5d;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1319; --surface: #171c25; --surface-2: #1c222d;
+    --border: #262d3a; --border-strong: #343c4c;
+    --fg: #e8ebf1; --fg-muted: #a0a9b8; --fg-dim: #6e7788;
+    --accent: #7aa3cc; --accent-ink: #0f1319; --accent-soft: #1f2a37;
+    --grid: rgba(122, 163, 204, 0.08);
+    --sev-crit-bar: #e85d5d;
+    color-scheme: dark;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: var(--f-body);
+    font-size: 14px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; cursor: pointer; }
+  input, select, textarea { font: inherit; color: inherit; }
+  h1 { font-family: var(--f-display); font-weight: 600; margin: 0; text-wrap: balance; }
+
+  /* ---------- LOGIN ---------- */
+  .login-shell {
+    min-height: 100vh;
+    display: grid; place-items: center;
+    padding: 24px 16px;
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 32px 32px,
+      var(--bg);
+  }
+  .login-card {
+    width: 100%; max-width: 380px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 28px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 32px rgba(15,19,25,0.06);
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 24px;
+  }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--accent); color: var(--accent-ink);
+    display: grid; place-items: center;
+    font-family: var(--f-display); font-weight: 700; font-size: 15px;
+  }
+  .brand-name {
+    font-family: var(--f-display); font-weight: 600; font-size: 15px;
+    letter-spacing: -0.01em;
+  }
+  .login-card h1 {
+    font-size: 22px; letter-spacing: -0.01em; margin-bottom: 6px;
+  }
+  .login-sub {
+    color: var(--fg-muted); font-size: 13px; margin-bottom: 24px;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field label {
+    font-size: 12px; font-weight: 500; color: var(--fg-muted);
+    letter-spacing: 0.02em;
+  }
+  .field input {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--fg);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .btn-primary {
+    width: 100%;
+    background: var(--accent); color: var(--accent-ink);
+    border: 0; border-radius: 8px;
+    padding: 11px 14px; margin-top: 6px;
+    font-weight: 600; font-size: 14px;
+    transition: filter .15s, transform .05s;
+  }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-primary:active { transform: translateY(1px); }
+  .hint {
+    margin-top: 16px; padding: 10px 12px;
+    background: var(--accent-soft); border-radius: 6px;
+    font-size: 12px; color: var(--fg-muted);
+    font-family: var(--f-mono);
+  }
+  .error {
+    margin-top: 10px; font-size: 12px; color: var(--sev-crit-bar);
+    min-height: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<div class="login-shell" id="login">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-mark">H</div>
+      <div class="brand-name">Helpdesk · Mesa de Incidencias</div>
+    </div>
+    <h1>Iniciar sesión</h1>
+    <p class="login-sub">Accede con tus credenciales de operador.</p>
+    <form id="login-form" autocomplete="off" action="mesa-incidencias.html" method="get">
+      <div class="field">
+        <label for="user">Usuario</label>
+        <input id="user" name="user" type="text" required placeholder="admin">
+      </div>
+      <div class="field">
+        <label for="pass">Contraseña</label>
+        <input id="pass" name="pass" type="password" required placeholder="••••••">
+      </div>
+      <button type="submit" class="btn-primary">Entrar</button>
+      <div class="error" id="login-error"></div>
+    </form>
+    <div class="hint">Credenciales de prueba — usuario: admin / contraseña: admin</div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const u = document.getElementById('user').value.trim();
+    const p = document.getElementById('pass').value;
+    const err = document.getElementById('login-error');
+    if (u === 'admin' && p === 'admin') {
+      err.textContent = '';
+      // Redirige a la pagina principal
+      window.location.href = 'mesa-incidencias.html';
+    } else {
+      err.textContent = 'Credenciales invalidas. Prueba admin / admin.';
+    }
+  });
+</script>
+
+</body>
+</html>

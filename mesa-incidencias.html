@@ -1,0 +1,841 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mesa de Incidencias</title>
+<style>
+  :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}
+  img{max-width:100%}
+  [hidden]:not([hidden=until-found i]){display:none!important}
+
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #fafbfc;
+    --border: #e3e6ec;
+    --border-strong: #cfd4dd;
+    --fg: #1a1f2b;
+    --fg-muted: #5b6473;
+    --fg-dim: #8a93a3;
+    --accent: #3b5a7a;
+    --accent-ink: #ffffff;
+    --accent-soft: #e8eef5;
+    --grid: rgba(59, 90, 122, 0.06);
+
+    --sev-crit-bg: #fdecec; --sev-crit-fg: #8a1f1f; --sev-crit-bar: #c0392b;
+    --sev-high-bg: #fdf1e2; --sev-high-fg: #8a4a0f; --sev-high-bar: #d87b1b;
+    --sev-med-bg:  #fdf7dd; --sev-med-fg:  #7a5f0a; --sev-med-bar:  #c9a81b;
+    --sev-low-bg:  #e8f1e8; --sev-low-fg:  #2e5a2e; --sev-low-bar:  #4a8a4a;
+
+    --st-open-bg:    #e8eef5; --st-open-fg:    #2a4660;
+    --st-prog-bg:    #e4edf7; --st-prog-fg:    #1f4f7a;
+    --st-wait-bg:    #f1ebdd; --st-wait-fg:    #6b5417;
+    --st-closed-bg:  #e9ecef; --st-closed-fg:  #4a515b;
+
+    --f-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --f-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --f-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1319;
+      --surface: #171c25;
+      --surface-2: #1c222d;
+      --border: #262d3a;
+      --border-strong: #343c4c;
+      --fg: #e8ebf1;
+      --fg-muted: #a0a9b8;
+      --fg-dim: #6e7788;
+      --accent: #7aa3cc;
+      --accent-ink: #0f1319;
+      --accent-soft: #1f2a37;
+      --grid: rgba(122, 163, 204, 0.08);
+
+      --sev-crit-bg: #3a1818; --sev-crit-fg: #f3b4b4; --sev-crit-bar: #e85d5d;
+      --sev-high-bg: #3a2611; --sev-high-fg: #f0c48a; --sev-high-bar: #e8923b;
+      --sev-med-bg:  #302a0d; --sev-med-fg:  #ead78a; --sev-med-bar:  #d6ba3a;
+      --sev-low-bg:  #152a15; --sev-low-fg:  #a8d8a8; --sev-low-bar:  #6ab06a;
+
+      --st-open-bg: #1f2a37; --st-open-fg: #a9c3dd;
+      --st-prog-bg: #1a2a3d; --st-prog-fg: #9bc0e2;
+      --st-wait-bg: #2a2415; --st-wait-fg: #d8c585;
+      --st-closed-bg: #22262e; --st-closed-fg: #a0a9b8;
+
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1319; --surface: #171c25; --surface-2: #1c222d;
+    --border: #262d3a; --border-strong: #343c4c;
+    --fg: #e8ebf1; --fg-muted: #a0a9b8; --fg-dim: #6e7788;
+    --accent: #7aa3cc; --accent-ink: #0f1319; --accent-soft: #1f2a37;
+    --grid: rgba(122, 163, 204, 0.08);
+    --sev-crit-bg: #3a1818; --sev-crit-fg: #f3b4b4; --sev-crit-bar: #e85d5d;
+    --sev-high-bg: #3a2611; --sev-high-fg: #f0c48a; --sev-high-bar: #e8923b;
+    --sev-med-bg:  #302a0d; --sev-med-fg:  #ead78a; --sev-med-bar:  #d6ba3a;
+    --sev-low-bg:  #152a15; --sev-low-fg:  #a8d8a8; --sev-low-bar:  #6ab06a;
+    --st-open-bg: #1f2a37; --st-open-fg: #a9c3dd;
+    --st-prog-bg: #1a2a3d; --st-prog-fg: #9bc0e2;
+    --st-wait-bg: #2a2415; --st-wait-fg: #d8c585;
+    --st-closed-bg: #22262e; --st-closed-fg: #a0a9b8;
+    color-scheme: dark;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: var(--f-body);
+    font-size: 14px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; cursor: pointer; }
+  input, select, textarea { font: inherit; color: inherit; }
+  h1, h2, h3 { font-family: var(--f-display); font-weight: 600; margin: 0; text-wrap: balance; }
+
+  /* ---------- APP SHELL ---------- */
+  .app { display: grid; grid-template-rows: auto 1fr; min-height: 100vh; }
+
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--accent); color: var(--accent-ink);
+    display: grid; place-items: center;
+    font-family: var(--f-display); font-weight: 700; font-size: 15px;
+  }
+  .brand-name {
+    font-family: var(--f-display); font-weight: 600; font-size: 15px;
+    letter-spacing: -0.01em;
+  }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .user-chip {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--fg-muted);
+  }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+    display: grid; place-items: center;
+    font-weight: 600; font-size: 12px;
+  }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--fg-muted); border-radius: 6px;
+    padding: 6px 10px; font-size: 12px;
+    transition: color .15s, border-color .15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-ghost:hover { color: var(--fg); border-color: var(--border-strong); }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 0;
+  }
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 16px 12px;
+  }
+  .nav-section {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--fg-dim); padding: 10px 10px 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 6px;
+    color: var(--fg-muted); font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 0; background: transparent;
+    width: 100%; text-align: left;
+    transition: background .12s, color .12s;
+  }
+  .nav-item:hover { background: var(--surface-2); color: var(--fg); }
+  .nav-item.active {
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .nav-item .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+    opacity: 0.6;
+  }
+
+  .main { padding: 24px 28px; min-width: 0; }
+  .page-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 20px; gap: 16px; flex-wrap: wrap;
+  }
+  .page-head h2 { font-size: 20px; letter-spacing: -0.01em; }
+  .page-head .page-sub { color: var(--fg-muted); font-size: 13px; }
+
+  /* ---------- DASHBOARD ---------- */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px; margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+    position: relative; overflow: hidden;
+  }
+  .kpi-label {
+    font-size: 12px; color: var(--fg-muted); font-weight: 500;
+    letter-spacing: 0.02em; margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-family: var(--f-display); font-size: 28px; font-weight: 600;
+    letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+  }
+  .kpi-delta {
+    font-size: 12px; margin-top: 4px; color: var(--fg-dim);
+    font-family: var(--f-mono);
+  }
+  .kpi-delta.up { color: var(--sev-crit-bar); }
+  .kpi-delta.down { color: var(--sev-low-bar); }
+  .kpi .stripe {
+    position: absolute; top: 0; left: 0; height: 3px; width: 100%;
+    background: var(--accent);
+  }
+  .kpi.crit .stripe { background: var(--sev-crit-bar); }
+  .kpi.warn .stripe { background: var(--sev-high-bar); }
+  .kpi.ok .stripe { background: var(--sev-low-bar); }
+
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 14px;
+  }
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px;
+  }
+  .panel h3 {
+    font-size: 14px; font-weight: 600; margin-bottom: 14px;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .panel h3 .meta { color: var(--fg-dim); font-size: 11px; font-weight: 500; font-family: var(--f-mono); }
+
+  .chart { height: 180px; width: 100%; }
+
+  .bars { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 110px 1fr 40px; align-items: center; gap: 10px; font-size: 12px; }
+  .bar-row .lbl { color: var(--fg-muted); }
+  .bar-row .track { background: var(--surface-2); height: 8px; border-radius: 4px; overflow: hidden; }
+  .bar-row .fill { height: 100%; border-radius: 4px; background: var(--accent); }
+  .bar-row .num { text-align: right; font-family: var(--f-mono); color: var(--fg); font-variant-numeric: tabular-nums; }
+
+  /* ---------- INCIDENTS LIST ---------- */
+  .toolbar {
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .toolbar input, .toolbar select {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 7px 10px; font-size: 13px;
+    color: var(--fg);
+  }
+  .toolbar input { flex: 1; min-width: 180px; }
+  .toolbar input:focus, .toolbar select:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .btn-accent {
+    background: var(--accent); color: var(--accent-ink); border: 0;
+    border-radius: 6px; padding: 7px 14px; font-size: 13px; font-weight: 600;
+    transition: filter .15s;
+  }
+  .btn-accent:hover { filter: brightness(1.08); }
+
+  .table-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  .inc-table-scroll { overflow-x: auto; }
+  table.inc-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    min-width: 720px;
+  }
+  .inc-table th {
+    text-align: left; font-weight: 500; color: var(--fg-muted);
+    font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .inc-table td {
+    padding: 12px 14px; border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .inc-table tr:last-child td { border-bottom: 0; }
+  .inc-table tr { cursor: pointer; transition: background .12s; }
+  .inc-table tbody tr:hover { background: var(--surface-2); }
+  .inc-id { font-family: var(--f-mono); font-size: 12px; color: var(--fg-muted); }
+  .inc-title { font-weight: 500; color: var(--fg); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  .badge .b-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .sev-crit { background: var(--sev-crit-bg); color: var(--sev-crit-fg); }
+  .sev-high { background: var(--sev-high-bg); color: var(--sev-high-fg); }
+  .sev-med  { background: var(--sev-med-bg);  color: var(--sev-med-fg); }
+  .sev-low  { background: var(--sev-low-bg);  color: var(--sev-low-fg); }
+
+  .status { font-weight: 500; font-size: 11px; }
+  .st-open   { background: var(--st-open-bg);   color: var(--st-open-fg); }
+  .st-prog   { background: var(--st-prog-bg);   color: var(--st-prog-fg); }
+  .st-wait   { background: var(--st-wait-bg);   color: var(--st-wait-fg); }
+  .st-closed { background: var(--st-closed-bg); color: var(--st-closed-fg); }
+
+  .mini-avatar {
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .mini-avatar .av {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+    display: grid; place-items: center;
+    font-size: 10px; font-weight: 600;
+  }
+  .when { color: var(--fg-dim); font-size: 12px; font-family: var(--f-mono); }
+
+  /* ---------- MODAL ---------- */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(15,19,25,0.5);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px; z-index: 100;
+  }
+  .modal-backdrop.active { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; width: 100%; max-width: 520px;
+    padding: 24px; max-height: 90vh; overflow-y: auto;
+  }
+  .modal h3 { font-size: 18px; margin-bottom: 4px; }
+  .modal .modal-sub { color: var(--fg-muted); font-size: 13px; margin-bottom: 18px; }
+  .modal .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .modal .field label {
+    font-size: 12px; font-weight: 500; color: var(--fg-muted);
+    letter-spacing: 0.02em;
+  }
+  .modal .field input {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; color: var(--fg);
+  }
+  .modal .field textarea {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; color: var(--fg);
+    min-height: 90px; resize: vertical; font-family: inherit;
+  }
+  .modal .field textarea:focus,
+  .modal .field select:focus,
+  .modal .field input:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .modal .field select {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; color: var(--fg);
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-actions {
+    display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px;
+  }
+
+  /* ---------- DETAIL PANEL ---------- */
+  .detail {
+    display: grid; grid-template-columns: 1fr 220px; gap: 20px;
+  }
+  .detail-meta { display: flex; flex-direction: column; gap: 14px; }
+  .meta-item .meta-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--fg-dim); margin-bottom: 4px;
+  }
+  .meta-item .meta-value { font-size: 13px; color: var(--fg); }
+  .desc { color: var(--fg-muted); line-height: 1.6; font-size: 13px; }
+  .timeline { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .timeline h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--fg-dim); margin-bottom: 10px; font-weight: 500; }
+  .event { display: flex; gap: 10px; margin-bottom: 10px; font-size: 12px; }
+  .event .ev-time { color: var(--fg-dim); font-family: var(--f-mono); min-width: 70px; }
+  .event .ev-text { color: var(--fg-muted); }
+  .event .ev-text strong { color: var(--fg); }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 820px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar {
+      border-right: 0; border-bottom: 1px solid var(--border);
+      padding: 8px; display: flex; gap: 4px; overflow-x: auto;
+    }
+    .nav-section { display: none; }
+    .nav-item { white-space: nowrap; padding: 7px 12px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .dash-grid { grid-template-columns: 1fr; }
+    .main { padding: 18px 16px; }
+    .topbar { padding: 10px 16px; }
+    .detail { grid-template-columns: 1fr; }
+    .row2 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 420px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .kpi-value { font-size: 24px; }
+    .user-chip .user-name { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== APP ========== -->
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">H</div>
+      <div class="brand-name">Helpdesk</div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="avatar">A</div>
+        <span class="user-name">admin</span>
+      </div>
+      <a class="btn-ghost" href="login.html" id="logout">Salir</a>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="nav-section">Panel</div>
+      <button class="nav-item active" data-view="dashboard"><span class="dot"></span>Dashboard</button>
+      <button class="nav-item" data-view="incidents"><span class="dot"></span>Incidencias</button>
+      <div class="nav-section">Catalogos</div>
+      <button class="nav-item" data-view="incidents" data-filter="open"><span class="dot"></span>Abiertas</button>
+      <button class="nav-item" data-view="incidents" data-filter="crit"><span class="dot"></span>Criticas</button>
+      <button class="nav-item" data-view="incidents" data-filter="mine"><span class="dot"></span>Asignadas a mi</button>
+    </aside>
+
+    <main class="main">
+      <!-- DASHBOARD VIEW -->
+      <section id="view-dashboard">
+        <div class="page-head">
+          <div>
+            <h2>Dashboard</h2>
+            <div class="page-sub">Resumen operativo de la mesa de servicio</div>
+          </div>
+          <div class="page-sub when" id="today"></div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi crit">
+            <div class="stripe"></div>
+            <div class="kpi-label">Incidencias abiertas</div>
+            <div class="kpi-value" id="kpi-open">—</div>
+            <div class="kpi-delta up">▲ 3 vs ayer</div>
+          </div>
+          <div class="kpi warn">
+            <div class="stripe"></div>
+            <div class="kpi-label">Criticas sin asignar</div>
+            <div class="kpi-value" id="kpi-crit">—</div>
+            <div class="kpi-delta">SLA en riesgo: 2</div>
+          </div>
+          <div class="kpi ok">
+            <div class="stripe"></div>
+            <div class="kpi-label">Resueltas hoy</div>
+            <div class="kpi-value" id="kpi-closed">—</div>
+            <div class="kpi-delta down">▼ 12% vs semana</div>
+          </div>
+          <div class="kpi">
+            <div class="stripe"></div>
+            <div class="kpi-label">Tiempo medio respuesta</div>
+            <div class="kpi-value">2h 14m</div>
+            <div class="kpi-delta">Objetivo SLA: 4h</div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="panel">
+            <h3>Incidencias por dia <span class="meta">ultimos 14 dias</span></h3>
+            <svg class="chart" viewBox="0 0 560 180" preserveAspectRatio="none" id="chart-sv"></svg>
+          </div>
+          <div class="panel">
+            <h3>Por categoria</h3>
+            <div class="bars" id="bars-cat"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INCIDENTS VIEW -->
+      <section id="view-incidents" hidden>
+        <div class="page-head">
+          <div>
+            <h2>Incidencias</h2>
+            <div class="page-sub">Gestion y seguimiento de tickets</div>
+          </div>
+          <button class="btn-accent" id="btn-new">+ Nueva incidencia</button>
+        </div>
+
+        <div class="toolbar">
+          <input type="search" id="search" placeholder="Buscar por titulo, ID o solicitante...">
+          <select id="filter-status">
+            <option value="">Todos los estados</option>
+            <option value="open">Abierta</option>
+            <option value="prog">En progreso</option>
+            <option value="wait">En espera</option>
+            <option value="closed">Cerrada</option>
+          </select>
+          <select id="filter-severity">
+            <option value="">Toda prioridad</option>
+            <option value="crit">Critica</option>
+            <option value="high">Alta</option>
+            <option value="med">Media</option>
+            <option value="low">Baja</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <div class="inc-table-scroll">
+          <table class="inc-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Titulo</th>
+                <th>Prioridad</th>
+                <th>Estado</th>
+                <th>Asignado</th>
+                <th>Actualizado</th>
+              </tr>
+            </thead>
+            <tbody id="inc-tbody"></tbody>
+          </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ========== NEW INCIDENT MODAL ========== -->
+<div class="modal-backdrop" id="modal-new">
+  <div class="modal">
+    <h3>Nueva incidencia</h3>
+    <p class="modal-sub">Registra un nuevo ticket en la mesa de servicio.</p>
+    <form id="form-new">
+      <div class="field">
+        <label>Titulo</label>
+        <input type="text" name="title" required placeholder="Describe brevemente el problema">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Prioridad</label>
+          <select name="severity">
+            <option value="low">Baja</option>
+            <option value="med" selected>Media</option>
+            <option value="high">Alta</option>
+            <option value="crit">Critica</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Categoria</label>
+          <select name="category">
+            <option>Red</option>
+            <option>Hardware</option>
+            <option>Software</option>
+            <option>Acceso</option>
+            <option>Correo</option>
+            <option>Otros</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Solicitante</label>
+          <input type="text" name="requester" placeholder="Nombre del usuario">
+        </div>
+        <div class="field">
+          <label>Asignar a</label>
+          <select name="assignee">
+            <option>Sin asignar</option>
+            <option>admin</option>
+            <option>M. Ortega</option>
+            <option>L. Reyes</option>
+            <option>J. Beltran</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Descripcion</label>
+        <textarea name="description" placeholder="Detalles del problema, pasos para reproducir..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" data-close>Cancelar</button>
+        <button type="submit" class="btn-accent">Crear incidencia</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== DETAIL MODAL ========== -->
+<div class="modal-backdrop" id="modal-detail">
+  <div class="modal" style="max-width: 640px;">
+    <div id="detail-body"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-ghost" data-close>Cerrar</button>
+      <button type="button" class="btn-accent" id="btn-close-inc">Marcar como resuelta</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --------- Data ---------
+  const SEV = {
+    crit: { label: 'Critica', cls: 'sev-crit' },
+    high: { label: 'Alta',    cls: 'sev-high' },
+    med:  { label: 'Media',   cls: 'sev-med'  },
+    low:  { label: 'Baja',    cls: 'sev-low'  },
+  };
+  const ST = {
+    open:   { label: 'Abierta',     cls: 'st-open' },
+    prog:   { label: 'En progreso', cls: 'st-prog' },
+    wait:   { label: 'En espera',   cls: 'st-wait' },
+    closed: { label: 'Cerrada',     cls: 'st-closed' },
+  };
+
+  const seed = [
+    { id:'INC-1042', title:'VPN corporativa cae intermitentemente', sev:'crit', st:'prog',   cat:'Red',      req:'C. Molina',  asg:'M. Ortega', upd:'hace 12 min', desc:'Usuarios reportan desconexiones cada 5-10 minutos al conectarse por VPN desde oficina remota.' },
+    { id:'INC-1041', title:'Impresora planta 3 no responde',        sev:'med',  st:'open',   cat:'Hardware', req:'A. Perez',   asg:'Sin asignar', upd:'hace 25 min', desc:'La impresora HP del piso 3 no aparece en la red; luz de error encendida.' },
+    { id:'INC-1040', title:'Buzon de correo lleno - directivo',     sev:'high', st:'open',   cat:'Correo',   req:'R. Guzman',  asg:'L. Reyes',  upd:'hace 40 min', desc:'Cuenta de direccion general supera el 95% del cupo. Solicita ampliacion urgente.' },
+    { id:'INC-1039', title:'Error 500 en portal de clientes',        sev:'crit', st:'open',   cat:'Software', req:'Sistema',    asg:'Sin asignar', upd:'hace 1 h',    desc:'Monitor automatico detecta errores 500 en /checkout. Impacto en produccion.' },
+    { id:'INC-1038', title:'Solicitud de alta en SAP',               sev:'low',  st:'wait',   cat:'Acceso',   req:'N. Vega',    asg:'J. Beltran',upd:'hace 2 h',    desc:'Nuevo colaborador necesita credenciales de SAP para modulo FI.' },
+    { id:'INC-1037', title:'Laptop sin cargar - golpe en conector',  sev:'med',  st:'prog',   cat:'Hardware', req:'E. Ruiz',    asg:'M. Ortega', upd:'hace 3 h',    desc:'Conector de carga danado. Se requiere evaluacion y posible cambio de pieza.' },
+    { id:'INC-1036', title:'Office se cierra al abrir Excel grande', sev:'med',  st:'prog',   cat:'Software', req:'P. Luna',    asg:'L. Reyes',  upd:'hace 4 h',    desc:'Al abrir archivos .xlsx > 50MB, Excel se cierra sin mensaje de error.' },
+    { id:'INC-1035', title:'Reset de contrasena dominio',            sev:'low',  st:'closed', cat:'Acceso',   req:'G. Soto',    asg:'admin',     upd:'ayer',        desc:'Usuario solicito restablecimiento. Entregado por canal seguro.' },
+    { id:'INC-1034', title:'Firewall bloquea servicio externo',      sev:'high', st:'wait',   cat:'Red',      req:'D. Castro',  asg:'J. Beltran',upd:'ayer',        desc:'Nueva regla bloquea API de proveedor logistico. Pendiente aprobacion de seguridad.' },
+    { id:'INC-1033', title:'Monitor adicional para contabilidad',    sev:'low',  st:'closed', cat:'Hardware', req:'I. Montes',  asg:'admin',     upd:'hace 2 d',    desc:'Entrega e instalacion de monitor secundario. Resuelto.' },
+  ];
+
+  let incidents = seed.slice();
+  let nextId = 1043;
+
+  // --------- Views ---------
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+  // Nav
+  $$('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const view = btn.dataset.view;
+      $('#view-dashboard').hidden = view !== 'dashboard';
+      $('#view-incidents').hidden = view !== 'incidents';
+      const f = btn.dataset.filter;
+      if (view === 'incidents') {
+        $('#filter-status').value = (f === 'open') ? 'open' : '';
+        $('#filter-severity').value = (f === 'crit') ? 'crit' : '';
+        $('#search').value = (f === 'mine') ? 'admin' : '';
+        renderTable();
+      }
+    });
+  });
+
+  // Filters
+  ['#search', '#filter-status', '#filter-severity'].forEach(sel => {
+    $(sel).addEventListener('input', renderTable);
+    $(sel).addEventListener('change', renderTable);
+  });
+
+  // New incident modal
+  $('#btn-new').addEventListener('click', () => openModal('modal-new'));
+  $$('[data-close]').forEach(b => b.addEventListener('click', () => closeAllModals()));
+  $$('.modal-backdrop').forEach(bd => {
+    bd.addEventListener('click', (e) => { if (e.target === bd) closeAllModals(); });
+  });
+
+  $('#form-new').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const nid = 'INC-' + (nextId++);
+    incidents.unshift({
+      id: nid,
+      title: fd.get('title') || 'Sin titulo',
+      sev: fd.get('severity'),
+      st: 'open',
+      cat: fd.get('category'),
+      req: fd.get('requester') || '—',
+      asg: fd.get('assignee') || 'Sin asignar',
+      upd: 'ahora',
+      desc: fd.get('description') || '',
+    });
+    e.target.reset();
+    closeAllModals();
+    // Switch to incidents view
+    $$('.nav-item').forEach(b => b.classList.remove('active'));
+    $$('.nav-item').find(b => b.dataset.view === 'incidents' && !b.dataset.filter)?.classList.add('active');
+    $('#view-dashboard').hidden = true;
+    $('#view-incidents').hidden = false;
+    renderAll();
+  });
+
+  function openModal(id) { $('#' + id).classList.add('active'); }
+  function closeAllModals() { $$('.modal-backdrop').forEach(m => m.classList.remove('active')); }
+
+  // --------- Render ---------
+  function renderAll() {
+    renderKPIs();
+    renderChart();
+    renderBars();
+    renderTable();
+    $('#today').textContent = new Date().toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' });
+  }
+
+  function renderKPIs() {
+    const open = incidents.filter(i => i.st !== 'closed').length;
+    const crit = incidents.filter(i => i.sev === 'crit' && i.st !== 'closed').length;
+    const closed = incidents.filter(i => i.st === 'closed').length;
+    $('#kpi-open').textContent = open;
+    $('#kpi-crit').textContent = crit;
+    $('#kpi-closed').textContent = closed;
+  }
+
+  function renderChart() {
+    const data = [8, 6, 11, 9, 14, 12, 7, 10, 13, 15, 11, 9, 14, 12];
+    const svg = $('#chart-sv');
+    const W = 560, H = 180, pad = { l: 32, r: 12, t: 14, b: 24 };
+    const max = Math.max(...data) + 2;
+    const bw = (W - pad.l - pad.r) / data.length;
+    let html = '';
+    for (let i = 0; i <= 4; i++) {
+      const y = pad.t + (H - pad.t - pad.b) * (i/4);
+      const v = Math.round(max - (max * i/4));
+      html += `<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="var(--border)" stroke-width="1"/>`;
+      html += `<text x="${pad.l - 6}" y="${y + 3}" fill="var(--fg-dim)" font-size="9" text-anchor="end" font-family="var(--f-mono)">${v}</text>`;
+    }
+    data.forEach((v, i) => {
+      const h = (H - pad.t - pad.b) * (v / max);
+      const x = pad.l + bw * i + 3;
+      const y = H - pad.b - h;
+      const w = bw - 6;
+      const color = i === data.length - 1 ? 'var(--accent)' : 'var(--accent-soft)';
+      const stroke = i === data.length - 1 ? 'var(--accent)' : 'var(--border-strong)';
+      html += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${color}" stroke="${stroke}" stroke-width="1" rx="2"/>`;
+    });
+    data.forEach((v, i) => {
+      if (i % 3 !== 0 && i !== data.length - 1) return;
+      const x = pad.l + bw * i + bw/2;
+      const d = new Date(); d.setDate(d.getDate() - (data.length - 1 - i));
+      const label = `${d.getDate()}/${d.getMonth()+1}`;
+      html += `<text x="${x}" y="${H - 8}" fill="var(--fg-dim)" font-size="9" text-anchor="middle" font-family="var(--f-mono)">${label}</text>`;
+    });
+    svg.innerHTML = html;
+  }
+
+  function renderBars() {
+    const cats = {};
+    incidents.forEach(i => { cats[i.cat] = (cats[i.cat] || 0) + 1; });
+    const entries = Object.entries(cats).sort((a,b) => b[1]-a[1]);
+    const max = Math.max(...entries.map(e => e[1]));
+    const palette = ['var(--accent)', '#5c7a9a', '#7a9ab8', '#a89b6c', '#c08a4a', '#8a6b4f'];
+    const wrap = $('#bars-cat');
+    wrap.innerHTML = entries.map(([k, v], i) => `
+      <div class="bar-row">
+        <div class="lbl">${k}</div>
+        <div class="track"><div class="fill" style="width:${(v/max)*100}%; background:${palette[i % palette.length]}"></div></div>
+        <div class="num">${v}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderTable() {
+    const q = $('#search').value.trim().toLowerCase();
+    const fs = $('#filter-status').value;
+    const fv = $('#filter-severity').value;
+    const rows = incidents.filter(i => {
+      if (fs && i.st !== fs) return false;
+      if (fv && i.sev !== fv) return false;
+      if (q) {
+        const hay = (i.id + ' ' + i.title + ' ' + i.req + ' ' + i.asg).toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    const tb = $('#inc-tbody');
+    if (!rows.length) {
+      tb.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--fg-dim)">Sin resultados que coincidan con los filtros</td></tr>`;
+      return;
+    }
+    tb.innerHTML = rows.map(i => `
+      <tr data-id="${i.id}">
+        <td><span class="inc-id">${i.id}</span></td>
+        <td><span class="inc-title">${esc(i.title)}</span></td>
+        <td><span class="badge ${SEV[i.sev].cls}"><span class="b-dot"></span>${SEV[i.sev].label}</span></td>
+        <td><span class="badge status ${ST[i.st].cls}">${ST[i.st].label}</span></td>
+        <td><span class="mini-avatar"><span class="av">${initials(i.asg)}</span>${esc(i.asg)}</span></td>
+        <td><span class="when">${i.upd}</span></td>
+      </tr>
+    `).join('');
+    $$('#inc-tbody tr').forEach(tr => {
+      tr.addEventListener('click', () => openDetail(tr.dataset.id));
+    });
+  }
+
+  function openDetail(id) {
+    const i = incidents.find(x => x.id === id);
+    if (!i) return;
+    $('#detail-body').innerHTML = `
+      <h3>${esc(i.title)}</h3>
+      <p class="modal-sub"><span class="inc-id">${i.id}</span> · ${i.cat}</p>
+      <div class="detail">
+        <div>
+          <p class="desc">${esc(i.desc)}</p>
+          <div class="timeline">
+            <h4>Actividad</h4>
+            <div class="event"><span class="ev-time">${i.upd}</span><span class="ev-text"><strong>${esc(i.asg)}</strong> actualizo el estado</span></div>
+            <div class="event"><span class="ev-time">hace 3 h</span><span class="ev-text"><strong>${esc(i.req)}</strong> anadio un comentario</span></div>
+            <div class="event"><span class="ev-time">creado</span><span class="ev-text">Ticket registrado por <strong>${esc(i.req)}</strong></span></div>
+          </div>
+        </div>
+        <div class="detail-meta">
+          <div class="meta-item"><div class="meta-label">Estado</div><div class="meta-value"><span class="badge status ${ST[i.st].cls}">${ST[i.st].label}</span></div></div>
+          <div class="meta-item"><div class="meta-label">Prioridad</div><div class="meta-value"><span class="badge ${SEV[i.sev].cls}"><span class="b-dot"></span>${SEV[i.sev].label}</span></div></div>
+          <div class="meta-item"><div class="meta-label">Solicitante</div><div class="meta-value">${esc(i.req)}</div></div>
+          <div class="meta-item"><div class="meta-label">Asignado a</div><div class="meta-value">${esc(i.asg)}</div></div>
+          <div class="meta-item"><div class="meta-label">Categoria</div><div class="meta-value">${i.cat}</div></div>
+        </div>
+      </div>
+    `;
+    $('#btn-close-inc').onclick = () => {
+      i.st = 'closed';
+      i.upd = 'ahora';
+      closeAllModals();
+      renderAll();
+    };
+    openModal('modal-detail');
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function initials(name) {
+    if (!name || name === 'Sin asignar') return '—';
+    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  // Inicializa la app al cargar
+  renderAll();
+</script>
+
+</body>
+</html>
